@@ -1,0 +1,36 @@
+/* css/style.css */
+
+/* Eliminamos márgenes y evitamos scroll */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+    touch-action: none;
+}
+
+/* El lienzo (canvas) es el corazón del juego */
+canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 1;
+    pointer-events: auto; /* IMPORTANTE: Esto permite que detecte tus clicks */
+}
+
+/* Estilo para el mensaje de victoria */
+.mensaje-victoria {
+    position: absolute;
+    color: white;
+    font-family: sans-serif;
+    text-align: center;
+    pointer-events: none;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    z-index: 2;
+}
