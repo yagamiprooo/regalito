@@ -10,8 +10,8 @@
 <body>
 <script>
     let imgNebulosa, imgYo, imgCorazon, imgElla;
-    let corazones = [];
-    let objetivos = [];
+    let corazones = [], objetivos = [];
+    let vidas = 5, puntos = 0, record = 0, estado = "JUGANDO";
 
     function preload() {
         imgNebulosa = loadImage('assets/nebulosa.jpg');
@@ -22,72 +22,87 @@
 
     function setup() {
         createCanvas(windowWidth, windowHeight);
-        // Creamos solo 2 objetivos para que no sea tan caótico
-        for (let i = 0; i < 2; i++) {
-            crearObjetivo();
-        }
+        for (let i = 0; i < 2; i++) crearObjetivo();
     }
 
     function crearObjetivo() {
-        objetivos.push({ 
-            x: random(50, width - 50), 
-            y: random(-200, -50), 
-            speed: random(0.5, 1.5), 
-            vida: 3, 
-            alpha: 255 
-        });
+        objetivos.push({ x: random(50, width - 50), y: random(-200, -50), speed: 1.5, vida: 3, alpha: 255 });
     }
 
     function draw() {
         background(imgNebulosa);
 
-        // 1. Dibujar jugador
-        image(imgYo, mouseX - 40, height - 150, 80, 80);
+        if (estado === "JUGANDO") {
+            // Jugador
+            image(imgYo, mouseX - 40, height - 150, 80, 80);
 
-        // 2. Objetivos
-        for (let i = objetivos.length - 1; i >= 0; i--) {
-            let obj = objetivos[i];
-            obj.y += obj.speed;
-            
-            tint(255, obj.alpha); // Efecto de desvanecimiento
-            image(imgElla, obj.x, obj.y, 70, 70);
-            noTint(); // Reset para que no afecte a otros elementos
+            // Objetivos
+            for (let i = objetivos.length - 1; i >= 0; i--) {
+                let obj = objetivos[i];
+                obj.y += obj.speed;
+                tint(255, obj.alpha);
+                image(imgElla, obj.x, obj.y, 70, 70);
+                noTint();
 
-            if (obj.y > height) { // Si sale de pantalla, lo reiniciamos
-                obj.y = random(-200, -50);
-                obj.x = random(50, width - 50);
-            }
-        }
-
-        // 3. Corazones
-        for (let i = corazones.length - 1; i >= 0; i--) {
-            let c = corazones[i];
-            c.y -= 10;
-            image(imgCorazon, c.x, c.y, 40, 40);
-
-            for (let j = objetivos.length - 1; j >= 0; j--) {
-                let obj = objetivos[j];
-                if (dist(c.x, c.y, obj.x + 35, obj.y + 35) < 40) {
-                    obj.vida -= 1;
-                    obj.alpha -= 85; // Baja la opacidad (255 / 3 = 85)
-                    corazones.splice(i, 1);
-                    
-                    if (obj.vida <= 0) {
-                        objetivos.splice(j, 1);
-                        crearObjetivo(); // Sale una nueva después de morir
-                    }
-                    break;
+                if (obj.y > height) {
+                    vidas--;
+                    objetivos.splice(i, 1);
+                    crearObjetivo();
+                    if (vidas <= 0) estado = "PERDIDO";
                 }
             }
-            if (c.y < 0) corazones.splice(i, 1);
+
+            // Corazones
+            for (let i = corazones.length - 1; i >= 0; i--) {
+                let c = corazones[i];
+                c.y -= 10;
+                image(imgCorazon, c.x, c.y, 40, 40);
+
+                for (let j = objetivos.length - 1; j >= 0; j--) {
+                    let obj = objetivos[j];
+                    if (dist(c.x, c.y, obj.x + 35, obj.y + 35) < 40) {
+                        obj.vida--;
+                        obj.alpha -= 85;
+                        corazones.splice(i, 1);
+                        if (obj.vida <= 0) {
+                            puntos++;
+                            if (puntos > record) record = puntos;
+                            objetivos.splice(j, 1);
+                            crearObjetivo();
+                        }
+                        break;
+                    }
+                }
+                if (c.y < 0) corazones.splice(i, 1);
+            }
+
+            // UI
+            fill(255); textSize(20);
+            text("Vidas: " + vidas + " | Puntos: " + puntos + " | Récord: " + record, 20, 30);
+        } else {
+            // Pantalla de Perder
+            fill(255, 0, 0); textSize(50); textAlign(CENTER, CENTER);
+            text("¡PERDISTE mi amor :(!", width/2, height/2 - 30);
+            fill(255); textSize(20);
+            text("Toca la pantalla para intentar de nuevo", width/2, height/2 + 30);
         }
+    }
+
+    function mousePressed() {
+        if (estado === "PERDIDO") {
+            vidas = 5; puntos = 0; estado = "JUGANDO";
+            objetivos = [];
+            for (let i = 0; i < 2; i++) crearObjetivo();
+        } else {
+            corazones.push({ x: mouseX, y: height - 150 });
+        }
+        return false;
     }
 
     function touchStarted() {
-        // Disparo: Aseguramos que se capture la posición del toque
-        corazones.push({ x: mouseX, y: height - 150 });
-        return false; 
+        return mousePressed();
     }
+    
 </script>
 </body>
 </html>
