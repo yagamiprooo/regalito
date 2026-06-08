@@ -88,20 +88,33 @@
         }
     }
 
-    function mousePressed() {
-        if (estado === "PERDIDO") {
-            vidas = 5; puntos = 0; estado = "JUGANDO";
-            objetivos = [];
-            for (let i = 0; i < 2; i++) crearObjetivo();
-        } else {
-            corazones.push({ x: mouseX, y: height - 150 });
-        }
-        return false;
-    }
+    // ... (mantiene todo tu código anterior igual hasta antes de las funciones de mouse)
 
-    function touchStarted() {
-        return mousePressed();
+function mousePressed() {
+    console.log("¡Clic registrado!"); // <--- MIRA TU CONSOLA (F12) SI SALE ESTO
+    disparar();
+    return false;
+}
+
+function touchStarted() {
+    console.log("¡Toque registrado!"); // <--- MIRA TU CONSOLA (F12) SI SALE ESTO
+    disparar();
+    return false;
+}
+
+function disparar() {
+    if (estado === "PERDIDO") {
+        vidas = 5; 
+        puntos = 0; 
+        estado = "JUGANDO";
+        objetivos = [];
+        for (let i = 0; i < 2; i++) crearObjetivo();
+    } else {
+        // Añadimos el corazón a la lista
+        corazones.push({ x: mouseX, y: height - 150 });
+        console.log("Corazones actuales: " + corazones.length);
     }
+}
     
 </script>
 </body>
