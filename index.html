@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Regalo para ti</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<script>
+    let imgNebulosa, imgYo, imgCorazon, imgElla;
+    let corazones = [];
+    let objetivos = [];
+
+    function preload() {
+        imgNebulosa = loadImage('assets/nebulosa.jpg');
+        imgYo = loadImage('assets/yo.jpg');
+        imgCorazon = loadImage('assets/corazon.png');
+        imgElla = loadImage('assets/ella.jpg');
+    }
+
+    function setup() {
+        createCanvas(windowWidth, windowHeight);
+        // Creamos solo 2 objetivos para que no sea tan caótico
+        for (let i = 0; i < 2; i++) {
+            crearObjetivo();
+        }
+    }
+
+    function crearObjetivo() {
+        objetivos.push({ 
+            x: random(50, width - 50), 
+            y: random(-200, -50), 
+            speed: random(0.5, 1.5), 
+            vida: 3, 
+            alpha: 255 
+        });
+    }
+
+    function draw() {
+        background(imgNebulosa);
+
+        // 1. Dibujar jugador
+        image(imgYo, mouseX - 40, height - 150, 80, 80);
+
+        // 2. Objetivos
+        for (let i = objetivos.length - 1; i >= 0; i--) {
+            let obj = objetivos[i];
+            obj.y += obj.speed;
+            
+            tint(255, obj.alpha); // Efecto de desvanecimiento
+            image(imgElla, obj.x, obj.y, 70, 70);
+            noTint(); // Reset para que no afecte a otros elementos
+
+            if (obj.y > height) { // Si sale de pantalla, lo reiniciamos
+                obj.y = random(-200, -50);
+                obj.x = random(50, width - 50);
+            }
+        }
+
+        // 3. Corazones
+        for (let i = corazones.length - 1; i >= 0; i--) {
+            let c = corazones[i];
+            c.y -= 10;
+            image(imgCorazon, c.x, c.y, 40, 40);
+
+            for (let j = objetivos.length - 1; j >= 0; j--) {
+                let obj = objetivos[j];
+                if (dist(c.x, c.y, obj.x + 35, obj.y + 35) < 40) {
+                    obj.vida -= 1;
+                    obj.alpha -= 85; // Baja la opacidad (255 / 3 = 85)
+                    corazones.splice(i, 1);
+                    
+                    if (obj.vida <= 0) {
+                        objetivos.splice(j, 1);
+                        crearObjetivo(); // Sale una nueva después de morir
+                    }
+                    break;
+                }
+            }
+            if (c.y < 0) corazones.splice(i, 1);
+        }
+    }
+
+    function touchStarted() {
+        // Disparo: Aseguramos que se capture la posición del toque
+        corazones.push({ x: mouseX, y: height - 150 });
+        return false; 
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+/* css/estilo.css */
+
+/* Eliminamos todos los márgenes y evitamos que el navegador intente hacer scroll */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Esto evita que la página se mueva al tocarla */
+    background-color: #000; /* Fondo negro para que resalte la nebulosa */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Bloquea gestos del navegador como zoom o scroll */
+    touch-action: none; 
+}
+
+/* El lienzo (canvas) es donde vive nuestro juego */
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover; /* Asegura que la imagen de fondo se ajuste bien */
+}
+
+/* Estilo adicional para el mensaje de victoria */
+.mensaje-victoria {
+    position: absolute;
+    color: white;
+    font-family: sans-serif;
+    text-align: center;
+    pointer-events: none; /* Para que no bloquee los toques al jugar */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
